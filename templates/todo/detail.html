@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+	<h1 class="pull-left">{{ todo.title }}</h1>
+	<a href="{% url 'update' todo.id %}" class="btn btn-primary pull-left">Edit</a>
+	<form method="POST" action="{% url 'delete' todo.id %}">
+		{% csrf_token %}
+		<button type="submit" class="btn btn-danger">Delete</button>
+	</form>
+
+	<span class="clearfix"></span>
+	<p>{{ todo.content }}</p>
+	<span class="badge">{{ todo.is_done }}</span>
+{% endblock %}
+
+
+{% block navigation %}
+    <li><a href="">Dashboard</a></li>
+{% endblock%}
+
+
