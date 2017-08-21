@@ -1,28 +1,122 @@
 {% extends 'base.html'%}
 
 {% block content %}
-<ul>
-	{% for todo in todos %}
-		<li>
-			<a href="{% url 'detail' todo.id %}" 
-				class="pull-left {% if todo.is_done %}done{% endif %}">{{ todo.title }}</a> 
+	
+	<div class="row">
 
-			{% if request.user.is_authenticated %}
-			<a href="{% url 'mark_complete' todo.id %}">
-			- Mark as {% if todo.is_done %}Incomplete{% else %}Complete{% endif %}</a>
-			{% endif %}
+		<div class="col-sm-2">
+			<h3>Latest Posts</h3>
+			<ul id="latest-post">
+				<!-- ajax content goes here -->
+			</ul>
+		</div>
 
-			<p>date created: {{ todo.date_created }}</p>
-		</li>
-	{% empty %}
-		<p>Sorry you don't have any items at all.</p>
-	{% endfor %}
-</ul>
+		<div class="col-sm-10">
+			<div class="row">
+				<div id="todo-form" class="col-sm-8">
+					{# todo form goes here #}
+				</div>
+
+				<div class="col-sm-8">
+					<table id="todos" class="table table-condensed">
+					<!-- ajax content goes here -->
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
 {% endblock %}
 
 {% block css %}
 	.done {
 		text-decoration: line-through;
 	}
+{% endblock %}
+
+{% block js %}
+
+<script>
+	$(document).ready(function(){
+		//script goes here
+
+
+		// $('#todos').html('<p>loading...</p>');
+		// $.ajax({
+		// 	url: '{% url "ajax_todos" %}',
+		// 	method: 'GET'
+		// }).done(function(response){
+		// 	$('#todos').html(response);
+ 	 	// 	$('#todos').html('');
+		// 	// for (var i=0; i < response.length; i++) {
+		// 	// 	MakeTemplate(response[i]);
+		// 	// }
+		// }).fail(function(err){
+		// 	console.log('response>>>>',err.statusText);
+		// });
+
+		// shorthand method
+		var url = '{% url "ajax_todos" %}';
+		$.get(url).done(function(response){
+			$('#todos').html(response);
+		});
+
+		var url_latest_post = '{% url "ajax_latest_posts" %}';
+		$.get(url_latest_post).done(function(response){
+			$('#latest-post').html(response);
+			// console.log('xresponse', response);
+			// for (var i=0; i < response.length; i++) {
+			// 	MakeTemplate(response[i]);
+			// }
+		}).fail(function(err){
+			// fail goes here...
+			alert('Oops, something went wrong.')
+		});
+
+		$.get('{% url "todo_form"%}').done(function(response){
+			$('#todo-form').html(response)
+		});
+
+		$(document).on('submit', '#todoForm', function(){
+			// submit form data
+			$.ajax({
+				method: 'POST',
+				url: '{% url "todo_form" %}',
+				data: $(this).serialize()
+			}).done(function(response){
+				var new_data = response;
+				var parent = $('#todos');
+
+				// creating new template for new data created.
+				var tpl = "<tr>" +
+							"<td>"+new_data.title+"</td>" + 
+							"<td>"+new_data.id+"</td>" + 
+							"</tr>";
+				parent.prepend(tpl);
+				$('#todoForm')[0].reset(); // reset form data
+			}).fail(function(error, x){
+				// validate form errors
+				if(error.status === 400) {
+					var error_msg = $('<span/>')
+					error_msg.addClass('error')
+					error_msg.text(error.responseJSON.title[0])
+					$('#id_title').after(error_msg);
+				}
+			});
+			return false;
+		});
+	});
+
+	function MakeTemplate(todo) {
+		var container = $('#latest-post');
+		var tpl = "<tr>"+
+					"<td>"+todo.title+"</td>" +
+					"<td>todo id:"+todo.id+"</td>" +
+					"<td>user id:"+todo.user+"</td>" +
+		           "</tr>";
+		container.append(tpl);
+	}
+</script>
+
 {% endblock %}
 

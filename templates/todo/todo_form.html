@@ -1,8 +1,4 @@
-{% extends 'base.html'%}
-
-{% block content %}
-
-<form method="POST" class="form" novalidate="">
+<form method="POST" id="todoForm" class="form" novalidate="">
 	{% csrf_token %}
 	<div class="form-group">
 		<label for="{{ form.title.label }}">{{ form.title.label }}:</label>
@@ -24,4 +20,3 @@
 	{%endif%}
 	</button>
 </form>
-{% endblock %}

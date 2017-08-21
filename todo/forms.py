@@ -14,6 +14,6 @@ class TodoModelForm(forms.ModelForm):
 		model = Todo
 		fields = ('title', 'content',)
 		widgets = {
-            'content': forms.Textarea(attrs={'cols': 20, 'rows': 2, 'class': 'form-control'}),
-        	'title': forms.TextInput(attrs={'class': 'form-control'})
+            'content': forms.Textarea(attrs={'cols': 20, 'rows': 2, 'class': 'form-control input-sm'}),
+        	'title': forms.TextInput(attrs={'class': 'form-control input-sm'})
         }
